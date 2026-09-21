@@ -15,6 +15,23 @@ into CI.**
 
 ---
 
+## Demo
+
+**Grounded answer — with citations, groundedness score, latency and cost:**
+
+![Grounded, cited answer over a filing](assets/demo-grounded.png)
+
+**Refusal — asked about a company that isn't in the indexed filings, the
+entity-scope guardrail declines instead of inventing numbers:**
+
+![Guardrail refuses an out-of-scope company](assets/demo-refusal.png)
+
+> Two independent safety gates: an **entity-scope check** before retrieval
+> (is this company even in the corpus?) and a **groundedness check** after
+> generation (is the answer supported by the retrieved text?).
+
+---
+
 ## Why this project is different from a "chat with your PDF" demo
 
 | Most student RAG projects | This project |
