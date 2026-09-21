@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-finance-rag"
+version = "0.1.0"
+description = "Agentic RAG over SEC filings: LangGraph, hybrid retrieval, guardrails, Ragas/DeepEval CI gate."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Caitlin Leonard" }]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+finrag-api = "finrag.api.main:main"
+finrag-eval = "finrag.eval.run_eval:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 90
+target-version = "py311"

@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: finrag
+      POSTGRES_PASSWORD: finrag
+      POSTGRES_DB: finrag
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finrag"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      FINRAG_PROVIDER: ${FINRAG_PROVIDER:-offline}
+      FINRAG_USE_PGVECTOR: ${FINRAG_USE_PGVECTOR:-false}
+      FINRAG_DATABASE_URL: postgresql+psycopg://finrag:finrag@postgres:5432/finrag
+      FINRAG_OPENAI_API_KEY: ${FINRAG_OPENAI_API_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports: ["8000:8000"]
+
+  ui:
+    build: .
+    command: streamlit run app/streamlit_app.py --server.address 0.0.0.0 --server.port 8501
+    environment:
+      FINRAG_API_URL: http://api:8000
+    depends_on: [api]
+    ports: ["8501:8501"]
+
+volumes:
+  pgdata:

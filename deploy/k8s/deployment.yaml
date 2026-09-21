@@ -1,0 +1,41 @@
+# Minimal Kubernetes manifest for the API (cloud-native deploy target).
+# Assumes the image is pushed to a registry and a pgvector Postgres is reachable.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finrag-api
+  labels: { app: finrag-api }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: finrag-api }
+  template:
+    metadata:
+      labels: { app: finrag-api }
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/caitlin-leonard/agentic-finance-rag:latest
+          ports: [{ containerPort: 8000 }]
+          env:
+            - { name: FINRAG_PROVIDER, value: "azure" }
+            - { name: FINRAG_USE_PGVECTOR, value: "true" }
+            - name: FINRAG_DATABASE_URL
+              valueFrom: { secretKeyRef: { name: finrag-secrets, key: database-url } }
+            - name: FINRAG_AZURE_OPENAI_API_KEY
+              valueFrom: { secretKeyRef: { name: finrag-secrets, key: azure-key } }
+          readinessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 10
+          resources:
+            requests: { cpu: "250m", memory: "512Mi" }
+            limits: { cpu: "1", memory: "1Gi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: finrag-api
+spec:
+  selector: { app: finrag-api }
+  ports: [{ port: 80, targetPort: 8000 }]
+  type: ClusterIP

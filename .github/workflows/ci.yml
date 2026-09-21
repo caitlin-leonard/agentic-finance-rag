@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test-and-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          pip install -r requirements.txt
+          pip install -e . ruff pytest
+
+      - name: Lint
+        run: ruff check src app tests
+
+      - name: Unit + behavioural tests
+        env:
+          FINRAG_PROVIDER: offline
+        run: pytest -q
+
+      # RAG quality gate: fails the build if faithfulness / relevancy / recall
+      # regress below thresholds. This is the "AI validation in CI/CD" line.
+      - name: RAG quality gate
+        env:
+          FINRAG_PROVIDER: offline
+        run: python -m finrag.eval.run_eval
+
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: eval_report.json
