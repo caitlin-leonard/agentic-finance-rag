@@ -17,7 +17,7 @@ A grounded answer, with the guardrail scores and cost:
 
 Each answer shows its citations — which filing and section every claim came from:
 
-![Citations](assets/demo-citations.png)
+![Citations](assets/image3.png)
 
 Ask about a company that isn't loaded and it refuses instead of inventing numbers:
 
