@@ -1,4 +1,4 @@
-# Agentic Finance RAG
+# Attest.AI : Agentic Finance RAG
 
 A question-answering system over SEC filings. Ask it about a company's revenue,
 margins or risk factors and it returns an answer with citations — or refuses when
